@@ -253,7 +253,9 @@ def before_edit_page(request, page):
     if request.method == "POST":
         if "localize-restart-translation" in request.POST:
             try:
-                translation = Translation.objects.get(
+                translation = Translation.objects.exclude(
+                    source__locale_id=page.locale_id
+                ).get(
                     source__object_id=page.translation_key,
                     target_locale_id=page.locale_id,
                     enabled=False,

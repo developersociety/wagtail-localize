@@ -886,7 +886,9 @@ def edit_translation(request, translation, instance):
                 .exclude(pk=instance.pk)
                 .exists()
             )
-        except (TranslationSource.DoesNotExist, IndexError):
+        except (
+            TranslationSource.DoesNotExist, IndexError, TranslationSource.MultipleObjectsReturned
+        ):
             add_convert_to_alias_url = False
     else:
         add_convert_to_alias_url = False
