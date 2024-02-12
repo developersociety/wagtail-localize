@@ -8,7 +8,7 @@ import polib
 from django.conf import settings
 from django.contrib.admin.utils import quote
 from django.contrib.auth import get_user_model
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import FieldDoesNotExist, PermissionDenied, ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models, transaction
 from django.http import Http404, HttpResponse
@@ -275,7 +275,10 @@ def get_segment_location_info(
 ):
     content_path_components = content_path.split(".")
     field_path_components = field_path.split(".")
-    field = source_instance._meta.get_field(field_path_components[0])
+    try:
+        field = source_instance._meta.get_field(field_path_components[0])
+    except FieldDoesNotExist:
+        raise FieldHasNoEditPanelError
 
     # Work out which tab the segment is on from edit handler
     try:

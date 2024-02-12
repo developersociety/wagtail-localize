@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 from django.apps import apps
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from wagtail import blocks
 from wagtail.fields import RichTextField, StreamField
@@ -257,7 +258,10 @@ def ingest_segments(original_obj, translated_obj, src_locale, tgt_locale, segmen
         segments_by_field_name[field_name].append(segment)
 
     for field_name, field_segments in segments_by_field_name.items():
-        field = translated_obj.__class__._meta.get_field(field_name)
+        try:
+            field = translated_obj.__class__._meta.get_field(field_name)
+        except FieldDoesNotExist:
+            continue
 
         if hasattr(field, "restore_translated_segments"):
             value = field.value_from_object(original_obj)
