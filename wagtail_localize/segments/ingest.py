@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from django.apps import apps
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import models
 from wagtail import blocks
 from wagtail.fields import RichTextField, StreamField
@@ -165,7 +165,10 @@ class StreamFieldSegmentsWriter:
             return RichText(restore_strings(template, strings))
 
         elif isinstance(block_type, blocks.ChooserBlock):
-            return self.handle_related_object_block(block_value, segments)
+            try:
+                return self.handle_related_object_block(block_value, segments)
+            except ObjectDoesNotExist:
+                return None
 
         elif isinstance(block_type, blocks.StructBlock):
             return self.handle_struct_block(block_value, segments)
